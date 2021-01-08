@@ -167,8 +167,8 @@ traceroute to ya.ru (87.250.250.242), 30 hops max, 60 byte packets
 
 #### Проверка задания
 
-1. Выполнить vagrant up.
-2. На сервере `centralRouter` выполнить /home/vagrant/knock.sh 10.0.0.2 8881 7777 9991 ; ssh vagrant@10.0.0.2 и ввести пароль `vagrant`, подключимся к серверу `inetRouter`.
+1. Выполнить `vagrant up && ansible-playbook network.yml`.
+2. На сервере `centralRouter` выполнить `/home/vagrant/knock.sh 10.0.0.2 8881 7777 9991 ; ssh vagrant@10.0.0.2` и ввести пароль `vagrant`, подключимся к серверу `inetRouter`.
 3. В браузере зайти по адресу http://192.168.10.10:8080.
 
 Ссылка на дополнительную информацию

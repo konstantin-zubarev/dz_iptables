@@ -1,0 +1,7 @@
+---
+
+- name: Configuration networs
+  hosts: all
+  become: true
+  roles:
+    - network

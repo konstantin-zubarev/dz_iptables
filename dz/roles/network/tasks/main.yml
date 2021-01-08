@@ -1,0 +1,22 @@
+---
+# tasks file for roles/network
+
+- name: Set timezone to Europe/Moscow
+  timezone:
+    name: Europe/Moscow
+
+- name: Configuration inetRouter
+  include_tasks: inetRouter.yml
+  when: ansible_hostname == "inetRouter"
+  
+- name: Configuration inetRouter2
+  include_tasks: inetRouter2.yml
+  when: ansible_hostname == "inetRouter2"
+
+- name: Configuration centralRouter
+  include_tasks: centralRouter.yml
+  when: ansible_hostname == "centralRouter"
+  
+- name: Configuration centralServer
+  include_tasks: centralServer.yml
+  when: ansible_hostname == "centralServer"

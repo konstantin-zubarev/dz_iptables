@@ -1,0 +1,53 @@
+---
+# tasks file for roles/network
+
+- name: Set ip forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: yes
+    reload: yes
+    
+- name: Install iptables-services
+  yum:
+    name: iptables-services
+    state: present
+
+- name: Start and enable iptables service
+  systemd:
+    name: iptables
+    state: started
+    enabled: yes
+    
+- name: iptables-save
+  copy:
+    src: iptables-inetRouter2
+    dest: /etc/sysconfig/iptables
+  notify: restart iptables
+
+- name: Set DEFROUTE=No
+  lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-eth0
+    regexp: '^DEFROUTE='
+    line: DEFROUTE="no"
+  notify:
+    - restart network
+
+- name: GATEWAY
+  lineinfile:
+    dest: /etc/sysconfig/network-scripts/ifcfg-eth1
+    insertafter: 'NETMASK'
+    regexp: '^GATEWAY='
+    line: 'GATEWAY=10.0.1.1'
+    state: present
+  notify: restart network
+
+- name: route-inetRouter
+  copy:
+    src: route-inetRouter2-eth1
+    dest: /etc/sysconfig/network-scripts/route-eth1
+
+- name: start network
+  systemd:
+    name: network
+    state: restarted

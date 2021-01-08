@@ -1,0 +1,46 @@
+---
+# tasks file for roles/network
+
+- name: Set ip forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: yes
+    reload: yes
+
+- name: Install nmap
+  yum:
+    name: nmap
+    state: present
+    
+- name: knocking port
+  copy:
+    src: knock.sh
+    dest: /home/vagrant/knock.sh
+    mode: a+x
+
+- name: Set DEFROUTE=No
+  lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-eth0
+    regexp: '^DEFROUTE='
+    line: DEFROUTE="no"
+  notify: restart network
+
+- name: GATEWAY
+  lineinfile:
+    dest: /etc/sysconfig/network-scripts/ifcfg-eth1
+    insertafter: 'NETMASK'
+    regexp: '^GATEWAY='
+    line: 'GATEWAY=10.0.0.2'
+    state: present
+  notify: restart network
+  
+- name: route-centerRouter
+  copy:
+    src: route-centerRouter-eth2
+    dest: /etc/sysconfig/network-scripts/route-eth2
+    
+- name: start network
+  systemd:
+    name: network
+    state: restarted

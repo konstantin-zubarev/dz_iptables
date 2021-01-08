@@ -1,0 +1,48 @@
+---
+# tasks file for roles/network
+
+- name: Install epel repo
+  yum:
+    name: epel-release
+    state: present
+    
+- name: Install Nginx package
+  yum:
+    name: nginx
+    state: present
+    
+#- name: Copy nginx.conf from template
+#  template:
+#    src: nginx.conf.j2
+#    dest: /etc/nginx/nginx.conf
+#  notify: restart nginx
+  
+- name: Enable Nginx service
+  systemd:
+    name: nginx
+    state: started
+    enabled: yes
+  tags: nginx
+  
+- name: Set DEFROUTE=No
+  lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-eth0
+    regexp: '^DEFROUTE='
+    line: DEFROUTE="no"
+  notify:
+    - restart network
+
+- name: GATEWAY
+  lineinfile:
+    dest: /etc/sysconfig/network-scripts/ifcfg-eth1
+    insertafter: 'NETMASK'
+    regexp: '^GATEWAY='
+    line: 'GATEWAY=192.168.0.1'
+    state: present
+  notify:
+    - restart network
+
+- name: start network
+  systemd:
+    name: network
+    state: restarted

@@ -1,0 +1,43 @@
+---
+# tasks file for roles/network
+
+- name: Set ip forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: yes
+    reload: yes
+
+- name: Install iptables-services
+  yum:
+    name: iptables-services
+    state: present
+
+- name: Start and enable iptables service
+  systemd:
+    name: iptables
+    state: started
+    enabled: yes
+    
+- name: iptables-save
+  copy:
+    src: iptables-inetRouter
+    dest: /etc/sysconfig/iptables
+  notify: restart iptables
+
+- name: enale ssh password authentication
+  lineinfile: 
+    dest: /etc/ssh/sshd_config
+    regexp: '^#?PasswordAuthentication' 
+    line: 'PasswordAuthentication yes'
+  notify: restart sshd
+
+- name: route-inetRouter
+  copy:
+    src: route-inetRouter-eth1
+    dest: /etc/sysconfig/network-scripts/route-eth1
+    
+- name: start network
+  systemd:
+    name: network
+    state: restarted
